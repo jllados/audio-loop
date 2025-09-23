@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Audio para Tinnitus · Alexa Skill</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Audio de enmascaramiento para tinnitus usado por una Skill de Alexa. Reproduce en loop y ayuda a camuflar el pitido.">
+  <link rel="preload" href="loop.mp3" as="audio" type="audio/mpeg">
+  <style>
+    :root {
+      --bg: #0f1226;
+      --card: #161a36;
+      --text: #e6e9ff;
+      --muted: #aab0ff;
+      --accent: #6c8bff;
+      --accent-2: #87f0c8;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% 0%, rgba(108,139,255,.15), transparent 60%),
+        radial-gradient(900px 500px at 90% 10%, rgba(135,240,200,.12), transparent 55%),
+        linear-gradient(180deg, #0c0f22 0%, #0f1226 30%, #0f1226 100%);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .card {
+      width: 100%;
+      max-width: 760px;
+      background: color-mix(in oklab, var(--card) 92%, black);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);
+      backdrop-filter: blur(6px);
+    }
+    .title {
+      margin: 0 0 8px;
+      font-size: clamp(20px, 3.5vw, 28px);
+      letter-spacing: 0.2px;
+    }
+    .subtitle {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: clamp(14px, 2.5vw, 16px);
+      line-height: 1.5;
+    }
+    .pill {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(108,139,255,.12);
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 13px;
+      border: 1px solid rgba(108,139,255,.25);
+      margin-bottom: 16px;
+    }
+    .section {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px dashed rgba(255,255,255,.08);
+    }
+    a {
+      color: var(--accent-2);
+      text-decoration: none;
+    }
+    a:hover { text-decoration: underline; }
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 12px 0 6px;
+    }
+    button {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform .06s ease, background .2s ease, border-color .2s ease;
+    }
+    button:hover { transform: translateY(-1px); border-color: rgba(255,255,255,.22); }
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
+    }
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      padding: 6px 8px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 8px;
+      display: inline-block;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
+    footer {
+      margin-top: 18px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <main class="card" role="main">
+    <div class="pill" aria-label="Información de la pista">
+      🎧 Audio para tinnitus · loop 1 min 12khz
+    </div>
+    <h1 class="title">Enmascaramiento suave para tinnitus</h1>
+    <p class="subtitle">
+      Esta pista está diseñada para ayudar a camuflar el pitido del tinnitus con un sonido neutro y no intrusivo. Se utiliza desde una Skill de Alexa que la reproduce en bucle para sesiones de descanso o concentración.
+    </p>
+
+    <div class="section" aria-labelledby="repro">
+      <h2 id="repro" class="title" style="font-size:20px;">Escuchar aquí (demo)</h2>
+      <div class="controls">
+        <button id="play">Reproducir</button>
+        <button id="pause">Pausar</button>
+        <button id="restart">Reiniciar</button>
+        <button id="toggleLoop">Loop: ON</button>
+      </div>
+      <div class="hint">Archivo: <span class="mono">tinnitus_reduced.mp3</span> · Reproduce en bucle de 60 segundos.</div>
+      <audio id="audio" src="loop.mp3" preload="auto" loop></audio>
+    </div>
+
+    <div class="section" aria-labelledby="alexa">
+      <h2 id="alexa" class="title" style="font-size:20px;">Uso en Alexa</h2>
+      <p class="subtitle">
+        La Skill referencia esta URL directa para reproducir el audio mediante <span class="mono">&lt;AudioPlayer&gt;</span>: 
+      </p>
+      <p><span class="mono">https://jllados.github.io/audio-loop/tinnitus_reduced.mp3</span></p>
+    </div>
+
+    <div class="section" aria-labelledby="nota">
+      <h2 id="nota" class="title" style="font-size:20px;">Nota</h2>
+      <p class="subtitle">
+        Esto no es un tratamiento médico. Si el tinnitus empeora o interfiere con el descanso, consulta con un profesional de la salud.
+      </p>
+    </div>
+
+    <footer>
+      <span>© 2025 Audio Loop para Tinnitus</span>
+      <span><a href="tinnitus_reduced.mp3" download>Descargar MP3</a></span>
+    </footer>
+  </main>
+
+  <script>
+    const audio = document.getElementById('audio');
+    const playBtn = document.getElementById('play');
+    const pauseBtn = document.getElementById('pause');
+    const restartBtn = document.getElementById('restart');
+    const toggleLoopBtn = document.getElementById('toggleLoop');
+
+    playBtn.addEventListener('click', () => audio.play());
+    pauseBtn.addEventListener('click', () => audio.pause());
+    restartBtn.addEventListener('click', () => { audio.currentTime = 0; audio.play(); });
+    toggleLoopBtn.addEventListener('click', () => {
+      audio.loop = !audio.loop;
+      toggleLoopBtn.textContent = 'Loop: ' + (audio.loop ? 'ON' : 'OFF');
+    });
+
+    // Autoplay en navegadores puede requerir interacción; el botón Reproducir se encarga.
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && !audio.paused) audio.play().catch(() => {});
+    });
+  </script>
+</body>
+</html>
